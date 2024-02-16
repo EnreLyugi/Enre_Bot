@@ -1,0 +1,14 @@
+{
+  "name": "enre_bot",
+  "version": "1.0.0",
+  "description": "A multiple function discord bot",
+  "main": "bot.js",
+  "author": "Enre Lyugi",
+  "scripts": {
+    "start": "node web/app.js"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "discord.js": "^14.14.1"
+  }
+}
