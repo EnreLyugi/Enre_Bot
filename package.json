@@ -1,4 +1,9 @@
 {
+  "name": "enre_bot",
+  "version": "1.2.0",
+  "description": "A multiple function discord bot",
+  "main": "bot.js",
+  "author": "Enre Lyugi",
   "dependencies": {
     "@discordjs/opus": "^0.9.0",
     "@jadestudios/discord-music-player": "^9.1.1-az28",
