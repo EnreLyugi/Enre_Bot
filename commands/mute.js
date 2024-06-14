@@ -1,21 +1,21 @@
-const Discord = require("discord.js");
+const { PermissionsBitField, EmbedBuilder } = require("discord.js");
 const ms = require("ms");
 const {
   Guild_vars,
   Users_level
 } = require('../includes/tables.js')
 
-module.exports.run = async (client, prefix, localization, message, args, sequelize, defcolor) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) return message.channel.send(localization.REQUIRE_USER_MANAGE_ROLES_PERMISSION);
+module.exports.run = async ({ client, prefix, localization, message, args, defcolor }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply(localization.REQUIRE_USER_MANAGE_ROLES_PERMISSION);
 
-  if (!message.guild.me.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_ROLES_PERMISSION);
+  if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_ROLES_PERMISSION);
 
   if(!args[0] || !args[1]) return message.reply(localization.usage.mute.replace(`{{prefix}}`, prefix));
   let tomuteusr = message.mentions.users.first() || client.users.resolve(args[0]);
   if(!tomuteusr) return message.reply(localization.USER_DONT_EXISTS);
   let tomute = message.guild.members.resolve(tomuteusr.id);
   if(!tomute) return message.reply(localization.USER_DONT_EXISTS);
-  //if(tomute.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) return message.reply("Você não tem permissão para usar este comando!");
+  if(tomute.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply(localization.CANT_TARGET_ADMIN);
 
   const guildVars = await Guild_vars.findAll({
     where: {
@@ -49,9 +49,9 @@ module.exports.run = async (client, prefix, localization, message, args, sequeli
     }
   });
 
-  const mutedembed = new Discord.MessageEmbed()
+  const mutedembed = new EmbedBuilder()
     .setColor(defcolor)
-    .setAuthor(message.guild.name, message.guild.iconURL())
+    .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
     .setDescription(localization.MUTE_MESSAGE.replace(`{{member}}`, tomute).replace(`{{time}}`, timeformat));
   message.reply({embeds: [mutedembed]});
 
@@ -63,25 +63,25 @@ module.exports.run = async (client, prefix, localization, message, args, sequeli
   if(guildVars[0].log_chat)
   {
     let curDate = new Date();
-    const mutedlog = new Discord.MessageEmbed()
+    const mutedlog = new EmbedBuilder()
       .setColor(defcolor)
-      .setAuthor('Mute!', message.guild.iconURL())
+      .setAuthor({ name: 'Mute!', iconURL: message.guild.iconURL() })
       .setThumbnail(tomuteusr.displayAvatarURL({format: 'png'}))
-      .addFields(
+      .addFields([
         {name: `🔇 ${localization.log_data.action}:`, value: `Mute!`},
         {name: `🔨 ${localization.log_data.author}:`, value: `${message.author}`},
         {name: `👤 ${localization.log_data.user}:`, value: `${tomute}`},
         {name: `⏰ ${localization.log_data.date_and_hour}:`, value: `${("0" + curDate.getDate()).slice(-2)}/${("0" + (curDate.getMonth() + 1)).slice(-2)}/${curDate.getFullYear()} ${("0" + curDate.getHours()).slice(-2)}:${("0" + curDate.getMinutes()).slice(-2)}:${("0" + curDate.getSeconds()).slice(-2)}`},
         {name: `⌛ ${localization.log_data.time}:`, value: `${timeformat}`},
         {name: `📜 ${localization.log_data.reason}:`, value: `${reason}`}
-      )
+      ])
       .setTimestamp();
     message.guild.channels.resolve(guildVars[0].log_chat).send({embeds: [mutedlog]});
   }
 
-  const mutedpvembed = new Discord.MessageEmbed()
+  const mutedpvembed = new EmbedBuilder()
     .setColor(defcolor)
-    .setAuthor(message.guild.name, message.guild.iconURL())
+    .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
     .setDescription(localization.MUTED_PRIVATE_MESSAGE.replace(`{{guild_name}}`, message.guild.name).replace(`{{time}}`, timeformat).replace(`{{reason}}`, reason));
     tomuteusr.send({embeds: [mutedpvembed]}).catch(e => {});
 
@@ -106,9 +106,9 @@ module.exports.run = async (client, prefix, localization, message, args, sequeli
           }
         });
 
-        const unmutedpvembed = new Discord.MessageEmbed()
+        const unmutedpvembed = new EmbedBuilder()
           .setColor(defcolor)
-          .setAuthor(message.guild.name, message.guild.iconURL())
+          .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
           .setDescription(localization.UNMUTED_PRIVATE_MESSAGE.replace(`{{guild_name}}`, message.guild.name));
           tomuteusr.send({embeds: [unmutedpvembed]}).catch(e => {});
       }

@@ -3,7 +3,7 @@ const {
   Users
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor, command) => {
+exports.run = async ({ prefix, localization, message, args, sequelize }) => {
   if(!args[0]) return message.reply(localization.usage.rep.replace(`{{prefix}}`, prefix));
 
   let user = message.guild.members.resolve(message.mentions.members.first().id) || message.guild.members.resolver(args[0])

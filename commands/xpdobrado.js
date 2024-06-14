@@ -1,33 +1,22 @@
-const Discord = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
+exports.run = async ({ localization, message, defcolor }) => {
   var today = new Date();
-  if(today.getDay() == 0)
-  {
-    message.reply(localization.TODAY_IS_SUNDAY);
-  }
-  else if (today.getDay() == 1)
-  {
-    message.reply(localization.TODAY_IS_MONDAY);
-  }
-  else if (today.getDay() == 2)
-  {
-    message.reply(localization.TODAY_IS_TUESDAY);
-  }
-  else if (today.getDay() == 3)
-  {
-    message.reply(localization.TODAY_IS_WEDNESDAY);
-  }
-  else if (today.getDay() == 4)
-  {
-    message.reply(localization.TODAY_IS_THURSDAY);
-  }
-  else if (today.getDay() == 5)
-  {
-    message.reply(localization.TODAY_IS_FRIDAY);
-  }
-  else if (today.getDay() == 6)
-  {
-    message.reply(localization.TODAY_IS_SATURDAY);
-  }
-}
+  var days = [
+    localization.TODAY_IS_SUNDAY,
+    localization.TODAY_IS_MONDAY,
+    localization.TODAY_IS_TUESDAY,
+    localization.TODAY_IS_WEDNESDAY,
+    localization.TODAY_IS_THURSDAY,
+    localization.TODAY_IS_FRIDAY,
+    localization.TODAY_IS_SATURDAY,
+  ];
+
+  let response = new EmbedBuilder()
+    .setColor(defcolor)
+    .setTitle("XP Dobrado")
+    .setDescription(days[today.getDay()]);
+
+  message.reply({ embeds: [response] });
+};
+

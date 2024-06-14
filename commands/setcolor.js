@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const { Op } = require('sequelize');
 const {
   Colors,
@@ -7,7 +6,7 @@ const {
   Color_inventory
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
+exports.run = async ({ prefix, localization, message, args }) => {
   if(!args[0]) return message.channel.send(localization.usage.setcolor.replace(`{{preifx}}`, prefix));
   let colorId;
   if(isNaN(args[0]))

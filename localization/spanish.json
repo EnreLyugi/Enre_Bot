@@ -14,6 +14,8 @@
     "REQUIRE_USER_BAN_MEMBERS_PERMISSION": "¡Necesita el permiso `Banear Miembros` para usar este comando!",
     "REQUIRE_USER_KICK_MEMBERS_PERMISSION": "¡Necesita el permiso `Expulsar Miembros` para usar este comando!",
 
+    "CANT_TARGET_ADMIN": "¡Este comando no se puede utilizar en Administrador/Moderador!",
+
     "ROLE_DONT_EXISTS": "¡Este role no existe en el servidor!",
     "USER_DONT_EXISTS": "¡Este usuario no existe!",
     "ONE_OF_USERS_DONT_EXISTS": "¡Uno de los usuarios no existe!",

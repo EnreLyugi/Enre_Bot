@@ -1,4 +1,4 @@
-exports.run = async (client, prefix, localization, message, args) => {
+exports.run = async ({ localization, message }) => {
   const m = await message.channel.send(localization.CALCULATING);
   m.edit(
     `${localization.PING}: **${

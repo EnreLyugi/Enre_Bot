@@ -1,11 +1,11 @@
-const Discord = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const { Op } = require('sequelize');
 const {
   Advertences_roles
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+exports.run = async ({ prefix, localization, message, args }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
   if(!args[0] || !args[1]) return message.channel.send(localization.usage.advadd.replace(`{{prefix}}`, prefix));
 

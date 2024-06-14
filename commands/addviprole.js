@@ -1,10 +1,10 @@
-const Discord = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const {
   Vip_role
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+exports.run = async ({ prefix, localization, message, args }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
   if(!args[0]) return message.channel.send(localization.usage.addviprole.replace(`{{prefix}}`, prefix));
 

@@ -1,22 +1,13 @@
-const Discord = require("discord.js");
+const { PermissionsBitField, AttachmentBuilder } = require("discord.js");
 const Canvas = require("canvas");
 const { Op } = require("sequelize");
-const { registerUser } = require("../includes/functions.js");
 const { Users, Users_level, Xp_roles } = require("../includes/tables.js");
 
-exports.run = async (
-  client,
-  prefix,
-  localization,
-  message,
-  args,
-  con,
-  defcolor
-) => {
+exports.run = async ({ client, localization, message, args }) => {
   if (
-    !message.guild.me
+    !message.guild.members.me
       .permissionsIn(message.channel)
-      .has(Discord.Permissions.FLAGS.ATTACH_FILES)
+      .has(PermissionsBitField.Flags.AttachFiles)
   )
     return message.reply(localization.REQUIRE_CLIENT_ATTACH_FILES_PERMISSION);
 
@@ -133,7 +124,7 @@ exports.run = async (
   ctx.closePath();
   ctx.clip();
   const avatar = await Canvas.loadImage(
-    user.displayAvatarURL({ format: "png" })
+    user.displayAvatarURL({ extension: "png" })
   );
   ctx.drawImage(
     avatar,
@@ -185,10 +176,7 @@ exports.run = async (
   ctx.allowNewLine = true;
   wrapText(ctx, status, 490, 370, 200, 20);
 
-  const attachment = new Discord.MessageAttachment(
-    canvas.toBuffer(),
-    "profile.png"
-  );
+  const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: "profile.png"});
 
   message.channel.send({ files: [attachment] }).catch((e) => {
     message.reply(localization.ERROR_SENDING_MESSAGE);

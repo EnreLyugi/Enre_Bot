@@ -1,11 +1,11 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const {
   Users_level,
   Guild_vars
-} = require('..tables.js');
+} = require('../includes/tables');
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor, command) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) return message.reply(localization.REQUIRE_USER_MANAGE_ROLES_PERMISSION);
+exports.run = async ({ client, prefix, localization, message, args, defcolor }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply(localization.REQUIRE_USER_MANAGE_ROLES_PERMISSION);
   if(!args[0]) return message.reply(localization.usage.unmute.replace(`{{prefix}}`, prefix));
 
   let member = message.guild.members.resolve(message.mentions.users.first().id) || message.guild.members.resolve(args[0]);
@@ -38,24 +38,24 @@ exports.run = async (client, prefix, localization, message, args, sequelize, def
         }
       });
 
-      const mutedembed = new Discord.MessageEmbed()
+      const mutedembed = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor(message.guild.name, message.guild.iconURL())
+        .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
         .setDescription(localization.UNMUTE_MESSAGE.replace(`{{member}}`, member));
       message.reply({embeds: [mutedembed]});
 
-      const unmutedpvembed = new Discord.MessageEmbed()
+      const unmutedpvembed = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor(message.guild.name, message.guild.iconURL())
+        .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
         .setDescription(localization.UNMUTED_PRIVATE_MESSAGE.replace(`{{guild_name}}`, message.guild.name))
       client.users.resolve(member.id).send({embeds: [unmutedpvembed]}).catch(e => {});
 
       if(guildVars[0].log_chat)
       {
         let curDate = new Date();
-        const mutedlog = new Discord.MessageEmbed()
+        const mutedlog = new EmbedBuilder()
           .setColor(defcolor)
-          .setAuthor('UnMute!', message.guild.iconURL())
+          .setAuthor({ name: 'UnMute!', iconURL: message.guild.iconURL() })
           .setThumbnail(client.users.resolve(member.id).displayAvatarURL({format: 'png'}))
           .addFields(
             {name: `🔊 ${localization.log_data.action}:`, value: `UnMute!`},

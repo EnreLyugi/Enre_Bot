@@ -388,6 +388,32 @@ const Users = db.define('users', {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
+    },
+    twitch_id: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
+    twitch_username: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
+    twitch_access_token: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
+    twitch_refresh_token: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
+    guild_id: {
+        type: Sequelize.STRING
+    },
+    channel_id: {
+        type: Sequelize.STRING
+    },
+    last_stream_id: {
+        type: Sequelize.STRING,
+        allowNull: true
     }
 }, {timestamps: false});
 

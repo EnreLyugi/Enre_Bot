@@ -1,22 +1,20 @@
-const { Guild, GuildMember } = require("discord.js");
-const Discord = require("discord.js");
+const { EmbedBuilder, PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const config = require("../config.json");
-const { RepeatMode } = require("discord-music-player");
+const { emojis } = require("../config.json");
+const { RepeatMode } = require("@jadestudios/discord-music-player");
 const { paginate } = require("../includes/functions.js");
 const { Guild_vars } = require("../includes/tables.js");
 
-const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
-
-exports.run = async (
+exports.run = async ({
   client,
   prefix,
   localization,
   message,
   args,
-  sequelize,
   defcolor,
   command
-) => {
+}) => {
+  console.log('initialized');
   let guildQueue = client.player.getQueue(message.guild.id);
 
   let url = args.join(" ");
@@ -43,35 +41,37 @@ exports.run = async (
   let autoShuffle = secondCommand || guildVars[0].auto_shuffle;
 
   if (!message.member.voice.channel) {
-    let response = new Discord.MessageEmbed()
-      .setColor("#FF0000")
-      .setAuthor(message.guild.name, message.guild.iconURL())
-      .setDescription(localization.MUST_BE_ON_CHANNEL);
+    let embed = new EmbedBuilder();
+    let response = embed
+        .setColor("#FF0000")
+        .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
+        .setDescription(localization.MUST_BE_ON_CHANNEL);
     message.channel.send({ embeds: [response] });
     return;
   }
 
-  if (!guild.me) return console.log(guild.me);
+  if (!guild.members.me) return console.log(guild.members.me);
 
   if (
-    guild.me.voice.channel &&
-    guild.me.voice.channel != member.voice.channel
+    guild.members.me.voice.channel &&
+    guild.members.me.voice.channel != member.voice.channel
   ) {
-    let response = new Discord.MessageEmbed()
+    let embed = new EmbedBuilder();
+    let response = embed
       .setColor("#FF0000")
-      .setAuthor(guild.name, guild.iconURL())
+      .setAuthor({ name: guild.name, iconURL: guild.iconURL()})
       .setDescription(localization.MUST_BE_ON_SAME_CHANNEL);
     message.channel.send({ embeds: [response] });
     return;
   }
 
   if (
-    !guild.me
+    !guild.members.me
       .permissionsIn(member.voice.channel)
       .has(
-        Discord.Permissions.FLAGS.CONNECT &&
-          Discord.Permissions.FLAGS.VIEW_CHANNEL &&
-          Discord.Permissions.FLAGS.SPEAK
+        PermissionsBitField.Flags.Connect &&
+        PermissionsBitField.Flags.ViewChannel &&
+        PermissionsBitField.Flags.Speak
       )
   )
     return message.reply(localization.REQUIRE_SEE_CONNECT_AND_SPEAK_PERMISSION);
@@ -99,29 +99,31 @@ exports.run = async (
       ((!url.includes("i=") || url.includes("playlist")) &&
         url.includes("apple.com"))
     ) {
-      let song = await queue
+      await queue
         .playlist(url, {
+          maxSongs: 10000,
           requestedBy: message.author,
           shuffle: autoShuffle,
         })
         .catch((err) => {
-          let response = new Discord.MessageEmbed()
+          let embed = new EmbedBuilder();
+          let response = embed
             .setColor("#FF0000")
-            .setAuthor(localization.ERROR_OCCURRED)
+            .setAuthor({ name: localization.ERROR_OCCURRED })
             .setDescription(err.message);
           message.channel.send({ embeds: [response] });
           if (!guildQueue) queue.stop();
         });
     } else {
-      let song = await queue
-        .play(url, {
+      await queue.play(url, {
           requestedBy: message.author,
         })
         .catch((err) => {
-          let response = new Discord.MessageEmbed()
+          let response = new EmbedBuilder()
             .setColor(`#FF0000`)
-            .setAuthor(localization.ERROR_OCCURRED)
+            .setAuthor({ name: localization.ERROR_OCCURRED })
             .setDescription(err.message);
+
           message.channel.send({ embeds: [response] });
           if (!guildQueue) queue.stop();
         });
@@ -173,9 +175,9 @@ exports.run = async (
       description = localization.LOOP_DISABLED;
     }
 
-    let response = new Discord.MessageEmbed()
+    let response = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor(`LOOP`)
+        .setAuthor({ name: `LOOP` })
         .setDescription(description);
     message.channel.send({ embeds: [response] });
   }
@@ -189,9 +191,9 @@ exports.run = async (
     if (parseInt(args[0]) > 100) return message.reply(localization.MAX_VOLUME);
 
     guildQueue.setVolume(parseInt(args[0]));
-    let response = new Discord.MessageEmbed()
+    let response = new EmbedBuilder()
       .setColor(defcolor)
-      .setAuthor(message.guild.name, message.guild.iconURL())
+      .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
       .setDescription(
         localization.VOLUME_CHANGED.replaceAll(`{{volume}}`, parseInt(args[0]))
       );
@@ -211,9 +213,9 @@ exports.run = async (
   if (command === "shuffle" || command === "misturar") {
     if (!guildQueue) return;
     guildQueue.shuffle();
-    let response = new Discord.MessageEmbed()
+    let response = new EmbedBuilder()
       .setColor(defcolor)
-      .setAuthor(message.guild.name, message.guild.iconURL())
+      .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
       .setDescription(localization.SONGS_SHUFFLED);
     message.channel.send({ embeds: [response] });
   }
@@ -245,23 +247,22 @@ exports.run = async (
     const backId = "back";
     const forwardId = "forward";
 
-    const backButton = new Discord.MessageButton()
+    const backButton = new ButtonBuilder()
       .setCustomId(backId)
       .setEmoji("⬅️")
-      .setStyle("SECONDARY");
+      .setStyle(ButtonStyle.Secondary);
 
-    const forwardButton = new Discord.MessageButton()
+    const forwardButton = new ButtonBuilder()
       .setCustomId(forwardId)
       .setEmoji("➡️")
-      .setStyle("SECONDARY");
+      .setStyle(ButtonStyle.Secondary);
 
     let description = "";
     for (const page of pages[0]) {
       description += `${page.index} -> [${page.song.name}](${page.song.url})[${page.song.duration}]\n`;
     }
 
-    const queueEmbed = new Discord.MessageEmbed({
-      color: defcolor,
+    const queueEmbed = new EmbedBuilder({
       author: {
         name: message.guild.name,
         icon_url: message.guild.iconURL(),
@@ -271,14 +272,13 @@ exports.run = async (
         text: `${localization.PAGE}: 1/${pages.length}`,
         icon_url: client.user.avatarURL(),
       },
-    });
+    }).setColor(defcolor);
 
     const canFitOnOnePage = pages.length < 2;
+    const pageComponents = canFitOnOnePage ? [] : [ new ActionRowBuilder().addComponents(forwardButton) ]
     const queueMessage = await message.channel.send({
       embeds: [queueEmbed],
-      components: [
-        new Discord.MessageActionRow({ components: [forwardButton] }),
-      ],
+      components: pageComponents,
     });
 
     if (canFitOnOnePage) return;
@@ -305,8 +305,7 @@ exports.run = async (
         description += `${page.index} - [${page.song.name}](${page.song.url})[${page.song.duration}]\n`;
       }
 
-      const pageEmbed = new Discord.MessageEmbed({
-        color: defcolor,
+      const pageEmbed = new EmbedBuilder({
         author: {
           name: interaction.guild.name,
           icon_url: interaction.guild.iconURL(),
@@ -316,7 +315,7 @@ exports.run = async (
           text: `${localization.PAGE}: ${currentIndex + 1}/${pages.length}`,
           icon_url: client.user.avatarURL(),
         },
-      });
+      }).setColor(defcolor);
 
       await interaction
         .update({
@@ -324,15 +323,15 @@ exports.run = async (
           components:
             currentIndex > 0 && currentIndex < pages.length - 1
               ? [
-                  new Discord.MessageActionRow({
-                    components: [backButton, forwardButton],
-                  }),
+                  new ActionRowBuilder().addComponents([backButton, forwardButton]),
                 ]
               : currentIndex == 0
-              ? [new Discord.MessageActionRow({ components: [forwardButton] })]
-              : [new Discord.MessageActionRow({ components: [backButton] })],
+              ? [new ActionRowBuilder().addComponents(forwardButton)]
+              : [new ActionRowBuilder().addComponents(backButton)],
         })
-        .catch((e) => {});
+        .catch((e) => {
+          console.log(e);
+        });
     });
   }
 
@@ -347,9 +346,10 @@ exports.run = async (
       arrow: config.progressBar.arrow,
     });
 
-    let response = new Discord.MessageEmbed()
+    let embed = new EmbedBuilder();
+    let response = embed
       .setColor(defcolor)
-      .setAuthor(localization.PLAYING_NOW)
+      .setAuthor({ name: localization.PLAYING_NOW })
       .setThumbnail(guildQueue.nowPlaying.thumbnail)
       .setDescription(
         `[${guildQueue.nowPlaying.name}](${
@@ -379,9 +379,9 @@ exports.run = async (
     });
     const progressbar = ProgressBar.prettier.replaceAll(" ", "▒");
 
-    let embed = new Discord.MessageEmbed()
+    let embed = new EmbedBuilder()
       .setColor("#FF0000")
-      .setAuthor(localization.SONG_PAUSED)
+      .setAuthor({ name: localization.SONG_PAUSED })
       .setThumbnail(guildQueue.nowPlaying.thumbnail)
       .setDescription(
         `[${guildQueue.nowPlaying.name}](${
@@ -410,9 +410,9 @@ exports.run = async (
 
     // [======>              ][00:35/2:20]
     console.log(progressbar);
-    let response = new Discord.MessageEmbed()
+    let response = new EmbedBuilder()
       .setColor(defcolor)
-      .setAuthor(message.guild.name, message.guild.iconURL())
+      .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
       .setDescription(progressbar);
     message.channel.send({ embeds: [response] });
     message.channel.send(progressbar);
@@ -420,14 +420,14 @@ exports.run = async (
 
   if (command === "autoshuffle") {
     if (
-      !message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)
+      !message.member.permissions.has(PermissionsBitField.Flags.Administrator)
     )
       return message.reply(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
     if (guildVars[0].auto_shuffle) {
-      let response = new Discord.MessageEmbed()
+      let response = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor(message.guild.name, message.guild.iconURL())
+        .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
         .setDescription(localization.AUTO_SHUFFLE_DISABLED);
       message.channel.send({ embeds: [response] });
 
@@ -440,9 +440,9 @@ exports.run = async (
         }
       );
     } else {
-      let response = new Discord.MessageEmbed()
+      let response = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor(message.guild.name, message.guild.iconURL())
+        .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
         .setDescription(localization.AUTO_SHUFFLE_ENABLED);
       message.channel.send({ embeds: [response] });
 

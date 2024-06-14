@@ -1,13 +1,13 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const {
   Guild_vars,
   Bans
 } = require('../includes/tables');
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor, command) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.BAN_MEMBERS)) return message.reply(localization.REQUIRE_USER_BAN_MEMBERS_PERMISSION);
+exports.run = async ({ client, prefix, localization, message, args, defcolor }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return message.reply(localization.REQUIRE_USER_BAN_MEMBERS_PERMISSION);
 
-  if (!message.guild.me.permissions.has(Discord.Permissions.FLAGS.BAN_MEMBERS)) return message.reply(localization.REQUIRE_CLIENT_BAN_MEMBERS_PERMISSION);
+  if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.BanMembers)) return message.reply(localization.REQUIRE_CLIENT_BAN_MEMBERS_PERMISSION);
 
   if(!args[0]) return message.channel.send(localization.usage.ban.replace(`{{prefix}}`, prefix));
 
@@ -26,9 +26,9 @@ exports.run = async (client, prefix, localization, message, args, sequelize, def
 
   let banMessage = (reason != '') ? localization.BAN_MESSAGE_WITH_REASON.replace(`{{member}}`, member).replace(`{{reason}}`, reason) : localization.BAN_MESSAGE_WITHOUT_REASON.replace(`{{member}}`, member);
 
-  const embed = new Discord.MessageEmbed()
+  const embed = new EmbedBuilder()
     .setColor(defcolor)
-    .setAuthor(message.guild.name, message.guild.iconURL())
+    .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
     .setDescription(banMessage);
 
   message.channel.send({embeds: [embed]})
@@ -48,10 +48,10 @@ exports.run = async (client, prefix, localization, message, args, sequelize, def
         reason = localization.REASON_NOT_INFORMED;
       }
       let curDate = new Date();
-      const banlog = new Discord.MessageEmbed()
+      const banlog = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor('Ban!', message.guild.iconURL())
-        .setThumbnail(client.users.resolve(member.id).displayAvatarURL({format: 'png'}))
+        .setAuthor({ name: 'Ban!', iconURL: message.guild.iconURL() })
+        .setThumbnail(client.users.resolve(member.id).displayAvatarURL({extension: 'png'}))
         .addFields(
           {name: `🚫 ${localization.log_data.action}:`, value: `Ban`},
           {name: `🔨 ${localization.log_data.author}:`, value: `${message.author}`},

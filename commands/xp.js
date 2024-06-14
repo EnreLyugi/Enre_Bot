@@ -1,10 +1,9 @@
-const Discord = require('discord.js');
-const config = require('../config.json');
+const { EmbedBuilder } = require('discord.js');
 const {
   Users_level
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor, command) => {
+exports.run = async ({ localization, message, defcolor }) => {
   const userLevel = await Users_level.findAll({
     where: {
       guild_id: message.guild.id,
@@ -12,9 +11,9 @@ exports.run = async (client, prefix, localization, message, args, sequelize, def
     }
   });
 
-  const embed = new Discord.MessageEmbed()
+  const embed = new EmbedBuilder()
     .setColor(defcolor)
-    .setAuthor(message.guild.name, message.guild.iconURL())
+    .setAuthor({ name: message.guild.name, iconURL: message.guild.iconURL() })
     .setDescription(localization.YOU_HAVE + ':\n' + userLevel[0].xp + 'XP');
 
   message.reply({embeds: [embed]});

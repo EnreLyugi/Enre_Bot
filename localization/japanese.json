@@ -14,6 +14,8 @@
     "REQUIRE_USER_BAN_MEMBERS_PERMISSION": "このコマンドを使用するには、`「メンバーの禁止」`権限が必要です。",
     "REQUIRE_USER_KICK_MEMBERS_PERMISSION": "このコマンドを使用するには、`「メンバーをキック」`権限が必要です。",
 
+    "CANT_TARGET_ADMIN": "このコマンドは管理者/モデレータでは使用できません",
+
     "ROLE_DONT_EXISTS": "この役割はサーバーに存在しません！",
     "USER_DONT_EXISTS": "このユーザーは存在しません！",
     "ONE_OF_USERS_DONT_EXISTS": "ユーザーの1人が存在しません！",

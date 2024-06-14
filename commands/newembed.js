@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, MessageCollector, EmbedBuilder } = require('discord.js');
 const config = require('../config.json');
 const {
   Embeds
@@ -6,13 +6,13 @@ const {
 
 const emojis = config.emojis;
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+exports.run = async ({ localization, message }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
-  if (!message.guild.me.permissions.has(Discord.Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_EMOJIS_AND_STICKERS_PERMISSION);
+  if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageGuildExpressions)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_EMOJIS_AND_STICKERS_PERMISSION);
 
   const settings = await message.reply(localization.TYPE_A_COLOR);
-  const collector1 = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
+  const collector1 = new MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
   collector1.on('collect', response => {
       if(response.content == '0')
       {
@@ -27,7 +27,7 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
         let embedColor = response.content;
         response.delete();
         settings.edit(localization.TYPE_A_TITLE);
-        const collector2 = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
+        const collector2 = new MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
         collector2.on('collect', response2 => {
             if(response2.content == '0')
             {
@@ -42,7 +42,7 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
               let embedTitle = response2.content;
               response2.delete();
               settings.edit(localization.TYPE_A_CONTENT);
-              const collector3 = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
+              const collector3 = new MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
               collector3.on('collect', response3 => {
                   if(response3.content == '0')
                   {
@@ -57,7 +57,7 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
                     let embedContent = response3.content;
                     response3.delete();
                     settings.edit(localization.TYPE_A_NAME);
-                    const collector4 = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
+                    const collector4 = new MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
                     collector4.on('collect', async response4 => {
                         if(response4.content == '0')
                         {
@@ -71,9 +71,9 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
                           collector4.stop();
                           let embedName = response4.content;
                           response4.delete();
-                          const newEmbed = new Discord.MessageEmbed()
+                          const newEmbed = new EmbedBuilder()
                             .setColor(embedColor)
-                            .setAuthor(embedTitle, message.guild.iconURL())
+                            .setAuthor({ name: embedTitle, iconURL: message.guild.iconURL() })
                             .setDescription(embedContent);
                           settings.delete();
                           const embedValidation = await message.reply(`${localization.WISH_CREATE_EMBED}\n\n`, newEmbed);

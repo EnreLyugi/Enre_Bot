@@ -1,11 +1,11 @@
-const Discord = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const {
   Users_level,
   Xp_roles
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-  if(!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+exports.run = async ({ localization, message }) => {
+  if(!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
   const users = await Users_level.findAll({
     where: {

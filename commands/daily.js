@@ -1,6 +1,4 @@
-const Discord = require('discord.js');
 const config = require('../config.json');
-const { Op } = require('sequelize');
 const {
   Users,
   Daily
@@ -8,7 +6,7 @@ const {
 
 const emojis = config.emojis;
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
+exports.run = async ({ client, localization, message, sequelize }) => {
 	const channel = message.channel;
 	const member = message.member;
 

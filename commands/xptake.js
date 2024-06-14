@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const { PermissionsBitField } = require("discord.js");
 const { Op } = require("sequelize");
 const {
   Users_level,
@@ -6,15 +6,8 @@ const {
   Level_rewards,
 } = require("../includes/tables.js");
 
-exports.run = async (
-  client,
-  prefix,
-  localization,
-  message,
-  args,
-  sequelize
-) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR))
+exports.run = async ({ client, prefix, localization, message, args, sequelize }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator))
     return message.channel.send(
       localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION
     );

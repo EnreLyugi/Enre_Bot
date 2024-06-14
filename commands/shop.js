@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, MessageCollector } = require('discord.js');
 const config = require('../config.json');
 const {
   Colors,
@@ -8,18 +8,18 @@ const {
 
 const emojis = config.emojis;
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor) => {
+exports.run = async ({ client, localization, message, sequelize, defcolor }) => {
 
-  if (!message.guild.me.permissions.has(Discord.Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_EMOJIS_AND_STICKERS_PERMISSION);
+  if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageGuildExpressions)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_EMOJIS_AND_STICKERS_PERMISSION);
 
   let ficha_comum = client.emojis.cache.get(emojis.ficha_comum).toString();
   let ficha_rara = client.emojis.cache.get(emojis.ficha_rara).toString();
   let bag = client.emojis.cache.get(emojis.bag).toString();
   let palette = client.emojis.cache.get(emojis.palette).toString();
 
-  const shopEmbed = new Discord.MessageEmbed()
+  const shopEmbed = new EmbedBuilder()
     .setColor(defcolor)
-    .setAuthor(localization.COLORS_SHOP, message.guild.iconURL())
+    .setAuthor({ name: localization.COLORS_SHOP, iconURL: message.guild.iconURL() })
     .setDescription(localization.SHOP_WELCOME.replace(`{{bag}}`, bag).replace(`{{palette}}`, palette))
   const shopm = await message.reply({embeds: [shopEmbed]});
   
@@ -70,12 +70,12 @@ exports.run = async (client, prefix, localization, message, args, sequelize, def
           });
 
           shoplist = shoplist + '\n' + localization.TYPE_COLOR_NUMBER;
-          const shopembed = new Discord.MessageEmbed()
+          const shopembed = new EmbedBuilder()
             .setColor(defcolor)
-            .setAuthor(localization.COLORS_SHOP, message.guild.iconURL())
+            .setAuthor({ name: localization.COLORS_SHOP, iconURL: message.guild.iconURL() })
             .setDescription(shoplist)
           shopm.edit({embeds: [shopembed]});
-          const collector = new Discord.MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
+          const collector = new MessageCollector(message.channel, m => m.author.id === message.author.id, { time: 120000 });
           collector.on('collect', async response => {
             if(colors[response.content])
             {

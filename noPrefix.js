@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const {Op} = require('sequelize');
 const {
 	Users,
@@ -10,17 +10,17 @@ const {
 
 const cooldown = require('./includes/cooldown.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor) => {
+exports.run = async ({ client, prefix, localization, message, sequelize, defcolor }) => {
 	if(message.author.bot) return null;
 
 	if(message.mentions.users.size)
 	{
-		if(!message.guild.me.permissionsIn(message.channel).has(Discord.Permissions.FLAGS.EMBED_LINKS) || message.guild.me.permissionsIn(message.channel).has(Discord.Permissions.FLAGS.SEND_MESSAGES)) return;
+		if(!message.guild.members.me.permissionsIn(message.channel).has(PermissionsBitField.Flags.EmbedLinks) || message.guild.members.me.permissionsIn(message.channel).has(PermissionsBitField.Flags.SendMessages)) return;
 		if(message.mentions.users.first() == client.user.id)
 		{
-			const embed = new Discord.MessageEmbed()
+			const embed = new EmbedBuilder()
 		      .setColor(defcolor)
-		      .setAuthor(client.user.username, message.guild.iconURL())
+		      .setAuthor({ name: client.user.username, iconURL: message.guild.iconURL() })
 		      .setDescription(localization.usage.BOT_PING.replaceAll(`{{prefix}}`, prefix));
 		    message.channel.send({embeds: [embed]});
 			return;

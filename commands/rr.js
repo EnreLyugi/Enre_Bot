@@ -1,11 +1,11 @@
-const Discord = require('discord.js')
+const { PermissionsBitField } = require('discord.js')
 const {
   Xp_roles,
   Level_rewards
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor, command) => {
-  if(!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) return message.reply(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+exports.run = async ({ prefix, localization, message, args }) => {
+  if(!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.reply(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
   if(!args[0]) return message.reply(localization.usage.rr.replace(`{{prefix}}`, prefix));
 

@@ -1,9 +1,11 @@
-const Discord = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const {
   Guild_vars
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
+exports.run = async ({ prefix, localization, message, args }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+  
   if(!args[0]) return message.reply(localization.usage.setmutedrole.replace(`{{prefix}}`, prefix));
 
   let role = message.mentions.roles.first() || message.guild.roles.resolve(args[0]);

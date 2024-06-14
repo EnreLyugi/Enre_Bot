@@ -1,12 +1,12 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, AttachmentBuilder } = require('discord.js');
 const Canvas = require('canvas');
 const { Op } = require('sequelize');
 const {
     Ships
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-    if(!message.guild.me.permissionsIn(message.channel).has(Discord.Permissions.FLAGS.ATTACH_FILES)) return message.reply(localization.REQUIRE_CLIENT_ATTACH_FILES_PERMISSION);
+exports.run = async ({ prefix, localization, message }) => {
+    if(!message.guild.members.me.permissionsIn(message.channel).has(PermissionsBitField.Flags.AttachFiles)) return message.reply(localization.REQUIRE_CLIENT_ATTACH_FILES_PERMISSION);
 
     let user1;
     let user2;
@@ -66,10 +66,10 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
     const canvas = Canvas.createCanvas(600, 300);
     const ctx = canvas.getContext('2d');
 
-    const avatar1 = await Canvas.loadImage(user1.displayAvatarURL({format: 'png'}));
+    const avatar1 = await Canvas.loadImage(user1.displayAvatarURL({extension: 'png'}));
     ctx.drawImage(avatar1, 0, 0, canvas.width/2, canvas.height);
 
-    const avatar2 = await Canvas.loadImage(user2.displayAvatarURL({format: 'png'}));
+    const avatar2 = await Canvas.loadImage(user2.displayAvatarURL({extension: 'png'}));
     ctx.drawImage(avatar2, canvas.width/2, 0, canvas.width/2, canvas.height);
 
     const heart = await Canvas.loadImage('./img/ship/heart.png');
@@ -82,6 +82,6 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
     ctx.font = `bold 40px serif`;
     ctx.fillText(`${value}%`, canvas.width/2, canvas.height/2);
 
-    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'ship.png');
+    const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'ship.png' });
     message.channel.send({files: [attachment]});
 };

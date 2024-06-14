@@ -1,13 +1,13 @@
-const Discord = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 const {
   Advertences_roles,
   Advertences
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) return message.reply(localization.REQUIRE_USER_MANAGE_ROLES_PERMISSION);
+exports.run = async ({ prefix, localization, message, args }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply(localization.REQUIRE_USER_MANAGE_ROLES_PERMISSION);
 
-  if (!message.guild.me.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_ROLES_PERMISSION);
+  if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) return message.reply(localization.REQUIRE_CLIENT_MANAGE_ROLES_PERMISSION);
 
   if(!args[0] || !args[1]) return message.channel.send(localization.usage.adv.replace(`{{prefix}}`, prefix));
 

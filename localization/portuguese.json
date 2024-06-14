@@ -13,6 +13,8 @@
     "REQUIRE_USER_MANAGE_ROLES_PERMISSION": "Você precisa da permissão `Gerenciar Cargos` para usar este comando!",
     "REQUIRE_USER_BAN_MEMBERS_PERMISSION": "Você precisa da permissão `Banir Membros` para usar este comando!",
     "REQUIRE_USER_KICK_MEMBERS_PERMISSION": "Você precisa da permissão `Expulsar Membros` para usar este comando!",
+    
+    "CANT_TARGET_ADMIN": "Esse comando não pode ser usado em Admins/Moderadores!",
 
     "ROLE_DONT_EXISTS": "Esse cargo não existe no servidor!",
     "USER_DONT_EXISTS": "Esse usuário não existe!",

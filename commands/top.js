@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const config = require('../config.json');
 const { Op } = require('sequelize');
 const {
@@ -8,7 +8,7 @@ const {
 
 const emojis = config.emojis;
 
-exports.run = async (client, prefix, localization, message, args, sequelize, defcolor, command) => {
+exports.run = async ({ client, localization, message, defcolor }) => {
   let top3 = client.emojis.cache.get(emojis.top3).toString();
   let rank = client.emojis.cache.get(emojis.rank).toString();
 
@@ -89,17 +89,17 @@ exports.run = async (client, prefix, localization, message, args, sequelize, def
       i++;
     }
     if(i == 10) {
-      let embed = new Discord.MessageEmbed()
+      let embed = new EmbedBuilder()
         .setColor(defcolor)
-        .setAuthor(localization.TOP_TITLE, message.guild.iconURL())
+        .setAuthor({ name: localization.TOP_TITLE, iconURL: message.guild.iconURL() })
         .setDescription(response);
       message.channel.send({embeds: [embed]});
       return;
     }
   }
-  let embed = new Discord.MessageEmbed()
+  let embed = new EmbedBuilder()
     .setColor(defcolor)
-    .setAuthor(localization.TOP_TITLE, message.guild.iconURL())
+    .setAuthor({ name: localization.TOP_TITLE, iconURL: message.guild.iconURL() })
     .setDescription(response);
   message.channel.send({embeds: [embed]});
 }

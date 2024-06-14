@@ -1,10 +1,10 @@
-const Discord = require('discord.js');
+const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const {
   Embeds
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
-  if (!message.member.permissions.has(Discord.Permissions.FLAGS.ADMINISTRATOR)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
+exports.run = async ({ localization, message }) => {
+  if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) return message.channel.send(localization.REQUIRE_USER_ADMINISTRATOR_PERMISSION);
 
   const embeds = Embeds.findAll({
     where: {
@@ -19,9 +19,9 @@ exports.run = async (client, prefix, localization, message, args, sequelize) => 
       embedString = embedString + '\nID:' + embed.id + ' - ' + embed.name;
     });
 
-    const embedList = new Discord.MessageEmbed()
+    const embedList = new EmbedBuilder()
       .setColor('#540094')
-      .setAuthor(localization.GUILD_EMBEDS, message.guild.iconURL())
+      .setAuthor({ name: localization.GUILD_EMBEDS, iconURL: message.guild.iconURL() })
       .setDescription(embedString);
     message.channel.send({embeds: [embedList]});
   }

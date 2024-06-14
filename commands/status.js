@@ -1,9 +1,8 @@
-const Discord = require('discord.js');
 const {
   Users
 } = require('../includes/tables.js');
 
-exports.run = async (client, prefix, localization, message, args, sequelize) => {
+exports.run = async ({ prefix, localization, message, args }) => {
   if(!args[0]) return message.channel.send(localization.usage.status.replace(`{{prefix}}`, prefix));
 
   let status = null;
